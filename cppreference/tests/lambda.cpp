@@ -3,171 +3,201 @@
 #include <cstdint>
 #include <type_traits>
 
+namespace
+{
+
+/**
+ * @brief ラムダ式の基本構文チェック
+ */
 TEST(
-    lambda, Basic
+    lambda, Syntax
 )
 {
   // tparams 無し
-  auto f1 = [](int x) { return x + 1; };
-  auto f2 = [](int x) noexcept { return x + 1; };
-  auto f3 = [](int x) mutable noexcept { return x + 1; };
-  auto f4 = [](int x) constexpr noexcept { return x + 1; };
-  auto f5 = [](int x) consteval noexcept { return x + 1; };
-  auto f6 = [](int x) static noexcept { return x + 1; };
+  auto fn1 = [](int __x) { return __x; };
+  auto fn2 = [](int __x) noexcept { return __x; };
+  auto fn3 = [](int __x) mutable noexcept { return __x; };
+  auto fn4 = [](int __x) constexpr noexcept { return __x; };
+  auto fn5 = [](int __x) consteval noexcept { return __x; };
+  auto fn6 = [](int __x) static noexcept { return __x; };
+
+  // mutable 指定がなければ、コピーキャプチャされた変数は const lvalue
+  std::int32_t __v = 1;
+  auto fn7 = [__v]() {
+    static_assert(!std::is_same_v<decltype((__v)), std::int32_t&>);
+    static_assert(std::is_same_v<decltype((__v)), const std::int32_t&>);
+  };
+  auto fn8 = [__v]() mutable {
+    static_assert(std::is_same_v<decltype((__v)), std::int32_t&>);
+    static_assert(!std::is_same_v<decltype((__v)), const std::int32_t&>);
+  };
 
   // tparams 有り
-  auto t1 = []<typename T>(T x) { return x + 1; };
-  auto t0 = []<typename T>
+  auto fn1_t = []<typename T>(T __x) { return __x; };
+  auto fn2_t = []<typename T>(T __x) noexcept { return __x; };
+  auto fn3_t = []<typename T>(T __x) mutable noexcept { return __x; };
+  auto fn4_t = []<typename T>(T __x) constexpr noexcept { return __x; };
+  auto fn5_t = []<typename T>(T __x) consteval noexcept { return __x; };
+  auto fn6_t = []<typename T>(T __x) static noexcept { return __x; };
+
+  // concepts も適用可能
+  auto fn1_t1 = []<typename T>
     requires std::is_integral_v<T>
-  (T x) { return x + 1; };
-  auto t2 = []<typename T>(T x) noexcept { return x + 1; };
-  auto t3 = []<typename T>(T x) mutable noexcept { return x + 1; };
-  auto t4 = []<typename T>(T x) constexpr noexcept { return x + 1; };
-  auto t5 = []<typename T>(T x) consteval noexcept { return x + 1; };
-  auto t6 = []<typename T>(T x) static noexcept { return x + 1; };
+  (T __x) { return __x; };
+
+  auto fn1_t2 = []<std::integral T>
+    requires std::is_integral_v<T>
+  (T __x) { return __x; };
 }
 
+/**
+ * @brief ClosureType 確認
+ */
 TEST(
     lambda, ClosureType
 )
 {
-  auto f1 = [](int x) { return x + 1; };
-  auto t1 = []<typename T>(T x) { return x + 1; };
+  auto fn1 = [](int __x) { return __x + 1; };
+  auto fn2 = []<typename T>(T __x) { return __x + 1; };
 
   // ret operator()(params) { body }
   // ret の型は推論される
   {
-    auto ret = f1.operator()(0);
-    EXPECT_EQ(ret, 1);
-    static_assert(std::is_same_v<int, decltype(ret)>);
+    auto ret11 = fn1.operator()(0);
+    auto ret12 = fn1(0);
+
+    EXPECT_EQ(1, ret11);
+    EXPECT_EQ(1, ret12);
+    static_assert(std::is_same_v<int, decltype(ret11)>);
+    static_assert(std::is_same_v<int, decltype(ret12)>);
   }
   {
-    auto ret = f1(0);
-    EXPECT_EQ(ret, 1);
-    static_assert(std::is_same_v<int, decltype(f1(0))>);
-  }
-  {
-    auto ret = t1.operator()<std::int32_t>(std::int32_t{1});
-    EXPECT_EQ(ret, 2);
-    static_assert(std::is_same_v<std::int32_t, decltype(ret)>);
-  }
-  {
-    auto ret = t1(std::int32_t{1});
-    EXPECT_EQ(ret, 2);
-    static_assert(std::is_same_v<std::int32_t, decltype(ret)>);
+    auto ret21 = fn2.operator()<std::int32_t>(std::int32_t{1});
+    auto ret22 = fn2(std::int32_t{1});
+
+    EXPECT_EQ(2, ret21);
+    EXPECT_EQ(2, ret22);
+    static_assert(std::is_same_v<std::int32_t, decltype(ret21)>);
+    static_assert(std::is_same_v<std::int32_t, decltype(ret22)>);
   }
 
   //  ClosureType::operator ret(*)(params)()
   // lambda の型は、対応する関数ポインタに変換可能
-  int (*f1_ptr)(int) = f1;
+  int (*fn1_ptr)(int) = fn1;
 
   // ClosureType::ClosureType()
   // ClosureType::operator=(const ClosureType&)
   // copy/move 可能
-  auto f1_cpctor(f1);
-  auto f1_mvctor(std::move(f1));
-  auto f1_cpa = f1;
-  auto f1_mva = std::move(f1);
+  auto fn1_cc(fn1);
+  auto fn1_mc(std::move(fn1));
+  auto fn1_ca = fn1;
+  auto fn1_ma = std::move(fn1);
 }
 
-template <std::integral... Ts>
-std::uint64_t Func1(
-    Ts... ts
-)
+auto Func1(
+    std::integral auto... args
+) -> std::uint64_t
 {
-  auto f = [&ts...]() { return (ts + ...); };
-  return f();
+  // template pack を参照キャプチャ
+  return [&args...]() { return (args + ...); }();
 };
 
-template <std::integral... Ts>
-std::uint64_t Func2(
-    Ts... ts
-)
+auto Func2(
+    std::integral auto... args
+) -> std::uint64_t
 {
-  auto f = [ts...]() { return (ts + ...); };
-  return f();
+  // template pack をコピーキャプチャ
+  return [args...]() { return (args + ...); }();
+}
+
+auto Func3(
+    std::integral auto... args
+) -> std::uint64_t
+{
+  // template pack を参照キャプチャ
+  return [&... vars = args]() { return (vars + ...); }();
 };
 
-class C1
+auto Func4(
+    std::integral auto... args
+) -> std::uint64_t
+{
+  // template pack をコピーキャプチャ
+  return [... vars = args]() { return (vars + ...); }();
+}
+
+struct Scp
 {
 public:
-  C1() = default;
-  C1(const C1&) = default;
-  C1(C1&&) = delete;
-  auto operator=(const C1&) -> C1& = delete;
-  auto operator=(C1&&) -> C1& = delete;
+  Scp() = default;
+  Scp(const Scp&) = default;
+  Scp(Scp&&) = delete;
+  auto operator=(const Scp&) -> Scp& = delete;
+  auto operator=(Scp&&) -> Scp& = delete;
+  ~Scp() = default;
 };
 
-class C2
+struct Smv
 {
 public:
-  C2() = default;
-  C2(const C2&) = delete;
-  C2(C2&&) = default;
-  C2& operator=(const C2&) = delete;
-  C2& operator=(C2&&) = delete;
+  Smv() = default;
+  Smv(const Smv&) = delete;
+  Smv(Smv&&) = default;
+  auto operator=(const Smv&) -> Smv& = delete;
+  auto operator=(Smv&&) -> Smv& = delete;
+  ~Smv() = default;
 };
 
 TEST(
-    lambda, LambdaCapture
+    lambda, Capture
 )
 {
-  thread_local std::uint32_t v_t = 0x1000'0000;
-  static std::uint32_t v_s = 0x0100'0000;
+  thread_local std::uint32_t v_t = 0x1000'0000; // NOLINT
+  static std::uint32_t v_s = 0x0100'0000;       // NOLINT
   constexpr std::uint32_t v_c = 0x0010'0000;
-  std::uint32_t v_a = 0x0001'0000;
+  std::uint32_t v_a = 0x0001'0000;              // NOLINT
 
-  C1 c1;
-  C2 c2;
+  Smv smv;
+  Scp scp;
 
-  // 参照キャプチャ (lambda の中で参照される変数を自動キャプチャ)
-  auto f1 = [&]() {
-    std::uint32_t tmp = 0;
-    tmp += v_t;
-    tmp += v_s;
-    tmp += v_c;
-    tmp += v_a;
-    return tmp;
-  };
-  EXPECT_EQ(f1(), 0x1111'0000);
+  // 自動参照キャプチャ
+  auto fn1 = [&]() { return v_t + v_s + v_c + v_a; };
+  EXPECT_EQ(fn1(), 0x1111'0000);
 
-  // コピーキャプチャ
-  auto f2 = [=]() {
-    std::uint32_t tmp = 0;
-    tmp += v_t;
-    tmp += v_s;
-    tmp += v_c;
-    tmp += v_a;
-    return tmp;
-  };
-  EXPECT_EQ(f2(), 0x1111'0000);
+  // 自動コピーキャプチャ
+  auto fn2 = [=]() { return v_t + v_s + v_c + v_a; };
+  EXPECT_EQ(fn2(), 0x1111'0000);
 
   // コピーキャプチャは copy constructor を呼び出す
-  // C2 はコピーキャプチャ不可
-  auto f2_c1 = [c1]() {};
-  // auto f2_c2 = [c2]() {};
+  // Copy constructor が delete されている場合は ill-formed
+  auto fn3_cp = [scp]() {};
+  // auto fn3_mv = [smv]() {};
+
+  // TLS/static 変数はキャプチャ対象にできない
+  // auto fn3_t = [&v_t]() { return v_t; };
+  // auto fn3_s = [&v_s]() { return v_s; };
+  // const 変数はキャプチャ不要
+  auto fn3_c = []() { return v_c; };
+  auto fn3_a = [&v_a]() { return v_a; };
 
   // capture は、宣言時の値をキャプチャする
   // コピーキャプチャは変数の値変更に影響されない
   // 参照キャプチャは変数の値変更に影響される
-  auto f3 = [=]() { return v_a; };
-  auto f4 = [&]() { return v_a; };
+  auto fn4 = [=]() { return v_a; };
+  auto fn5 = [&]() { return v_a; };
 
-  v_a = 0x0002'0000;
+  v_a = 0x0002'0000; // NOLINT
 
-  EXPECT_EQ(f3(), 0x0001'0000);
-  EXPECT_NE(f3(), 0x0002'0000);
-
-  EXPECT_EQ(f4(), 0x0002'0000);
-  EXPECT_NE(f4(), 0x0001'0000);
+  EXPECT_EQ(fn4(), 0x0001'0000);
+  EXPECT_EQ(fn5(), 0x0002'0000);
 
   // 各種キャプチャ
 
   // v_a のみコピーキャプチャ
-  auto f5 = [v_a]() { return v_a; };
+  auto fn6 = [v_a]() { return v_a; };
 
   // v_a のみ参照キャプチャ
-  auto f6 = [&v_a]() { return v_a; };
+  auto fn7 = [&v_a]() { return v_a; };
 
   // template pack キャプチャ
   EXPECT_EQ(std::uint64_t{15}, Func1(1, 2, 3, 4, 5));
@@ -175,7 +205,7 @@ TEST(
 
   struct S
   {
-    std::uint32_t v = 0x1111'0000;
+    std::uint32_t v = 0x1111'0000; // NOLINT
 
     void f()
     {
@@ -184,17 +214,40 @@ TEST(
       auto ff1 = [this]() { return v; };
       auto ff2 = [*this]() { return v; };
       auto ff3 = [&]() { return v; };
-      auto ff4 = [=]() { return v; };
+      auto ff4 = [=]() { return v; }; // NOLINT
 
-      v = 0x2222'0000;
+      v = 0x2222'0000;                // NOLINT
       EXPECT_EQ(0x2222'0000, ff1());
       EXPECT_EQ(0x1111'0000, ff2());
       EXPECT_EQ(0x2222'0000, ff3());
       EXPECT_EQ(0x2222'0000, ff4());
+
+      // class member のキャプチャには this か initializer が必要
+      // auto ff5 = [v]() { return v; };
+      auto ff5 = [this]() { return v; };
+      auto ff6 = [__v = v]() { return __v; };
     }
   };
-  S().f();
+  S __s;
+  __s.f();
 
   // initializer 付きキャプチャ
-  auto f7 = [x = v_a]() { return x; };
+  auto fn8 = [__x = v_a]() { return __x; };
+  auto fn9 = [&__x = v_a]() { return __x; };
+  EXPECT_EQ(std::uint64_t{15}, Func3(1, 2, 3, 4, 5));
+  EXPECT_EQ(std::uint64_t{15}, Func4(1, 2, 3, 4, 5));
+
+  struct Sbit
+  {
+    std::uint8_t x : 4 = 0x0F; // NOLINT
+    std::uint8_t y = 0x0F;     // NOLINT
+
+    void fn1()                 // NOLINT
+    {
+      // bit-field はコピーキャプチャのみ (non-const 参照が作成できない)
+      auto fb1 = [__x = x]() { return __x; };
+      // auto fb2 = [&__x = x]() { return __x; };
+    }
+  };
 }
+} // namespace
