@@ -1,0 +1,20 @@
+{
+    // C/C++ Intellisense settings
+    "C_Cpp.intelliSenseEngine": "disabled",
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.autocomplete": "disabled",
+    "C_Cpp.formatting": "disabled",
+    // clangd
+    "clangd.arguments": [
+        "--clang-tidy",
+        "--completion-style=detailed",
+        "--header-insertion=iwyu",
+        "--pch-storage=memory",
+    ],
+    "clangd.path": "/usr/bin/clangd-19",
+    "clangd.onConfigChanged": "restart",
+    // cmake
+    "cmake.configureArgs": [
+        "--preset=default",
+    ]
+}
