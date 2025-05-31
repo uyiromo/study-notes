@@ -115,7 +115,7 @@ BreakConstructorInitializers: BeforeColon
 BreakFunctionDefinitionParameters: true
 BreakInheritanceList: BeforeColon
 BreakStringLiterals: true
-BreakTemplateDeclarations: MultiLine
+BreakTemplateDeclarations: Yes
 ColumnLimit: 120
 CommentPragmas: "^ IWYU pragma:"
 CompactNamespaces: false
