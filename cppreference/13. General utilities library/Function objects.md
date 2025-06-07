@@ -91,7 +91,7 @@
 - 基本的な演算子を関数オブジェクトとして提供
 - 二項演算子の場合、`f(x, y)` は `x op y` と同じ意味
 
-- Atirhmetic
+- Arithmetic
   - `std::plus<T>`
   - `std::minus<T>`
   - `std::multiplies<T>`
