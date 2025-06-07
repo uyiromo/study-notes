@@ -16,5 +16,10 @@
     // cmake
     "cmake.configureArgs": [
         "--preset=default",
-    ]
+    ],
+    "cSpell.words": [
+        "subrange",
+        "tparams"
+    ],
+    "cmake.sourceDirectory": "/home/uyiromo/cpp-books/cppreference/tests"
 }
