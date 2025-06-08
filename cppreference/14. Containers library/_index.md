@@ -106,34 +106,93 @@
 
 ## Unordered associative containers
 - ハッシュテーブルを用いて探索を平均で O(1) で行えるコンテナ
-- unordered_set
-- unordered_map
-- unordered_multiset
-- unordered_multimap
+- Key の重複を許容しない
+  - unordered_set
+  - unordered_map
+- Key の重複を許容する
+  - unordered_multiset
+  - unordered_multimap
 
 
 <!-- markdownlint-disable-next-line -->
 ### Member types
 
-| Member type          | Definition                                        |
-| -------------------- | ------------------------------------------------- |
-| `key_type`           | key の型                                          |
-| `value_type`         | value の型 (set なら `key_type` と同じ)           |
-| `size_type`          | `std::size_t`                                     |
-| `difference_type`    | `std::ptrdiff_t`                                  |
-| `hasher`             | ハッシュ関数の型                                  |
-| `key_equal`          | キーの等価比較関数の型                            |
-| `allocator_type`     | アロケータの型                                    |
-| reference            | `value_type&`                                     |
-| const_reference      | `const value_type&`                               |
-| pointer              | `std::allocator_traits<Allocator>::pointer`       |
-| const_pointer        | `std::allocator_traits<Allocator>::const_pointer` |
-| iterator             | `LegacyForwardIterator for value_type`            |
-| const_iterator       | `LegacyForwardIterator for const value_type`      |
-| local iterator       | (bucket 内のイテレータ)                           |
-| const_local_iterator | (bucket 内の const イテレータ)                    |
-| node_type            | (TBD)                                             |
-| insert_return_type   | node_type を insert したときの返り値              |
+| Member type            | Definition                                        |
+| ---------------------- | ------------------------------------------------- |
+| `key_type`             | key の型                                          |
+| `value_type`           | value の型 (set なら `key_type` と同じ)           |
+| `size_type`            | `std::size_t`                                     |
+| `difference_type`      | `std::ptrdiff_t`                                  |
+| `hasher`               | ハッシュ関数の型                                  |
+| `key_equal`            | キーの等価比較関数の型                            |
+| `allocator_type`       | アロケータの型                                    |
+| `reference`            | `value_type&`                                     |
+| `const_reference`      | `const value_type&`                               |
+| `pointer`              | `std::allocator_traits<Allocator>::pointer`       |
+| `const_pointer`        | `std::allocator_traits<Allocator>::const_pointer` |
+| `iterator`             | `LegacyForwardIterator for value_type`            |
+| `const_iterator`       | `LegacyForwardIterator for const value_type`      |
+| `local iterator`       | (bucket 内のイテレータ)                           |
+| `const_local_iterator` | (bucket 内の const イテレータ)                    |
+| `node_type`            | (TBD)                                             |
+| `insert_return_type`   | node_type を insert したときの返り値              |
+
+
+<!-- markdownlint-disable-next-line -->
+### Iterators
+
+| function       | unordered_set | unordered_map | unordered_multiset | unordered_multimap |
+| -------------- | ------------- | ------------- | ------------------ | ------------------ |
+| begin / cbegin | ✅             | ✅             | ✅                  | ✅                  |
+| end / cend     | ✅             | ✅             | ✅                  | ✅                  |
+
+
+<!-- markdownlint-disable-next-line -->
+### Capacity
+
+| function      | unordered_set | unordered_map | unordered_multiset | unordered_multimap |
+| ------------- | ------------- | ------------- | ------------------ | ------------------ |
+| empty         | ✅             | ✅             | ✅                  | ✅                  |
+| size          | ✅             | ✅             | ✅                  | ✅                  |
+| max_size      | ✅             | ✅             | ✅                  | ✅                  |
+
+<!-- markdownlint-disable-next-line -->
+### Modifiers
+- `insert` は要素に加えて `::node_type` を指定可能
+- `extract` は Key を指定して `::node_type` を取り出す
+  - 要素の所有権を持つ
+  -
+
+
+| function     | unordered_set | unordered_map | unordered_multiset | unordered_multimap |
+| ------------ | ------------- | ------------- | ------------------ | ------------------ |
+| clear        | ✅             | ✅             | ✅                  | ✅                  |
+| insert       | ✅             | ✅             | ✅                  | ✅                  |
+| insert_range | ✅             | ✅             | ✅                  | ✅                  |
+| emplace      | ✅             | ✅             | ✅                  | ✅                  |
+| emplace_hint | ✅             | ✅             | ✅                  | ✅                  |
+| erase        | ✅             | ✅             | ✅                  | ✅                  |
+| swap         | ✅             | ✅             | ✅                  | ✅                  |
+| extract      | ✅             | ✅             | ✅                  | ✅                  |
+| merge        | ✅             | ✅             | ✅                  | ✅                  |
+
+
+### Lookup
+- `at` は `T&` を返す。存在しない場合は `std::out_of_range`
+- `operator[]` は `T&` を返す。存在しない場合は value を default construct する。Key は引数に応じて copy/move
+
+
+| function    | unordered_set | unordered_map | unordered_multiset | unordered_multimap |
+| ----------- | ------------- | ------------- | ------------------ | ------------------ |
+| count       | ✅             | ✅             | ✅                  | ✅                  |
+| find        | ✅             | ✅             | ✅                  | ✅                  |
+| contains    | ✅             | ✅             | ✅                  | ✅                  |
+| equal_range | ✅             | ✅             | ✅                  | ✅                  |
+| at          | ❌             | ✅             | ❌                  | ✅                  |
+| operator[]  | ❌             | ✅             | ❌                  | ✅                  |
+
+
+### Bucket interface / Hash policy / Observers / Non-member functions 省略
 
 
 ## Container adaptors
