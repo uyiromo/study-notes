@@ -18,8 +18,14 @@
         "--preset=default",
     ],
     "cSpell.words": [
+        "Assinable",
+        "cbefore",
+        "cbegin",
+        "cend",
+        "ilist",
         "subrange",
-        "tparams"
+        "tparams",
+        "uunordered"
     ],
     "cmake.sourceDirectory": "/home/uyiromo/cpp-books/cppreference/tests"
 }
