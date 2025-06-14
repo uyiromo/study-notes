@@ -196,3 +196,38 @@
 
 
 ## Container adaptors
+- Sequence container のインターフェイスを用途に合わせるもの
+- `stack`
+  - LIFO
+  - Container の末尾の要素を操作できるコンテナを使用可能
+    - `std::deque`
+    - `std::vector`
+    - `std::inplace_vector`
+- `queue`
+  - FIFO
+  - Container の先頭と末尾の要素を操作できるコンテナを使用可能
+    - `std::deque`
+    - `std::vector`
+    - `std::inplace_vector`
+- `priority_queue`
+  - 要素がソートされたキュー
+  - **`.top()` の返り値が必ず const_reference である**
+    - つまり、move で要素を移動できない
+  - Container の末尾の要素を操作できるコンテナを使用可能
+    - `std::deque`
+    - `std::vector`
+    - `std::inplace_vector`
+- `flat_set`
+  - 要素がソートされた set
+  - `std::set` / `std::unordered_set` と異なり、メモリ連続なコンテナを使用する
+  - 使用可能なコンテナ
+    - `std::vector`
+    - `std::inplace_vector`
+- `flat_map`
+  - `flat_set` に同じ
+- `flat_multiset`
+  - `flat_set` に同じ
+- `flat_multimap`
+  - `flat_set` に同じ
+
+- `flat_*` は TBD
