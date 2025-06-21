@@ -74,8 +74,8 @@
 
 ### Modifiers
 
-| function         | array | vector | inplace_vector | deque | forward_list | list |
-| ---------------- | ----- | ------ | -------------- | ----- | ------------ | ---- |
+| function         | array | vector    | inplace_vector   | deque  | forward_list   | list  |
+| ---------------- | ----- | --------- | ---------------- | ------ | -------------- | ----- |
 | fill             | ✅     | ❌      | ❌              | ❌     | ❌            | ❌    |
 | clear            | ❌     | ✅      | ✅              | ✅     | ✅            | ✅    |
 | erase            | ❌     | ✅      | ✅              | ✅     | ❌            | ✅    |

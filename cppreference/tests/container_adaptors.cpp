@@ -124,7 +124,7 @@ TEST(
     auto vec1 = std::vector<int>({1, 2, 3, 4, 5});             // NOLINT
 
     auto deq1x = std::deque<int>();                            // NOLINT
-    auto deq1y = std::deque<int>(vec1);                        // NOLINT
+    auto deq1y = std::deque<int>(vec1.begin(), vec1.end());    // NOLINT
     auto deq2 = std::deque<int>(++vec1.begin(), --vec1.end()); // NOLINT
 
     // front & back
@@ -155,5 +155,5 @@ TEST(
     deq1y.emplace_back(7);   // NOLINT
     EXPECT_EQ(deq1y.front(), -2);
     EXPECT_EQ(deq1y.back(), 7);
-
+}
 } // namespace
