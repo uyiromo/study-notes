@@ -1,4 +1,4 @@
 CompileFlags:
-    Compiler: /usr/bin/clang++-19
+    Compiler: /usr/local/bin/g++
     Add:
         - -std=c++23
