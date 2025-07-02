@@ -231,3 +231,29 @@
   - `flat_set` に同じ
 
 - `flat_*` は TBD
+
+
+## Views
+- `std::span`
+  - contiguous sequence に対する view
+  - 最初の要素と Extent (要素数) を保つ
+    - `static extent` => コンパイル時固定
+    - `dynamic extent` => 実行時に決定
+  - span の中の offset, count を指定して切り出せる
+- `std::mdspan`
+  - `std::span` の多次元版
+    - mappings が正しく動作していれば、contiguous でなくてもよい
+  ```C++
+  template<
+      class T,
+      class Extents,
+      class LayoutPolicy = std::layout_right,
+      class AccessorPolicy = std::default_accessor<T>
+  > class mdspan;
+  ```
+  - `Extents`: `std::extents` の特殊化で、コンパイル時固定
+  - `LayoutPolicy`: 多次元配列を一次元配列にマッピングする方法。`LayoutMappingPolicy` を満たす
+  - `AccessPolicy`: データハンドル＋オフセットから要素へのアクセス方法。`AccessorPolicy` を満たす
+    - `std::default_accessor<T>`
+      - `data_handle_type` = `T*` を取り、`access(p, i)` で `p[i]`、`offset(p, i)` で `p + i` を返す
+

@@ -16,16 +16,21 @@
     // cmake
     "cmake.configureArgs": [
         "--preset=default",
+        "-DCMAKE_CXX_COMPILER=/usr/local/bin/g++",
     ],
     "cSpell.words": [
         "Assinable",
         "cbefore",
         "cbegin",
         "cend",
+        "Dereferenceability",
         "ilist",
+        "ssize",
         "subrange",
         "tparams",
-        "uunordered"
+        "uunordered",
+        "writeability"
     ],
-    "cmake.sourceDirectory": "/home/uyiromo/cpp-books/cppreference/tests"
+    "cmake.sourceDirectory": "/home/uyiromo/cpp-books/cppreference/tests",
+    "cmake.ctest.testSuiteDelimiter": "[\\._]"
 }

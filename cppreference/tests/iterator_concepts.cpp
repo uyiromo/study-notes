@@ -411,7 +411,7 @@ TEST(
     static_assert(std::is_same_v<decltype(mv1.base()), decltype(std::as_const(it))>);
 
     static_assert(std::is_same_v<decltype(mv1)::iterator_category, std::random_access_iterator_tag>);
-    static_assert(std::is_same_v<decltype(mv1)::iterator_concept, std::input_iterator_tag>);
+    static_assert(std::is_same_v<decltype(mv1)::iterator_concept, std::random_access_iterator_tag>);
 
     // iter_value_t は std::iter_value_t<Iter> に移譲されるので元の型になる
     static_assert(std::is_same_v<std::iter_value_t<decltype(mv1)>, int>);
